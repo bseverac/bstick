@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'bstick'
+require 'daemons'
+
+Daemons.run_proc('server.rb') do
+  Bstick::Server.new.run
+end

@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+if !ARGV[0]
+  puts 'no argument'
+  exit 0
+end
+
+def write(state)
+  File.truncate('/tmp/led.state', 0)
+  File.write('/tmp/led.state', state, 0)
+end
+
+case ARGV[0]
+when 'on', 'off', 'blink' then
+  write(ARGV[0])
+when 'ping' then
+  write("#{ARGV[0]} #{ARGV[1]}")
+when 'run' then
+  write('blink')
+  system(ARGV.drop(1).join(' '))
+  write('off')
+else
+  puts 'invalid argument'
+  exit 0
+end
+exit 1

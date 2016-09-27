@@ -17,13 +17,14 @@ Gem::Specification.new do |spec|
   spec.files         = ["lib/bstick.rb", "lib/bstick/version.rb", "lib/blinkstick.rb"]
   spec.bindir        = "bin"
   spec.executables   << "bstick"
+  spec.executables   << "bstick_server"
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
-  spec.add_development_dependency "color", "~> 1.8"
-  spec.add_development_dependency "libusb", "~> 0.5"
-  spec.add_development_dependency "net-ping", "~> 2.0"
-  spec.add_development_dependency "daemons", "~> 1.2"
+  spec.add_dependency "color", "~> 1.8"
+  spec.add_dependency "libusb", "~> 0.5"
+  spec.add_dependency "net-ping", "~> 2.0"
+  spec.add_dependency "daemons", "~> 1.2"
 end

@@ -5,7 +5,8 @@ require_relative "blinkstick.rb"
 module Bstick
   class Server
     def initialize
-      @file   = File.open('/tmp/led.state', "a+")
+      file = File.expand_path("../../led.state", __FILE__)
+      @file   = File.open(file, "a+")
       @state  = 'off'
       @values = {}
     end
@@ -64,6 +65,11 @@ module Bstick
     end
 
     def ping_state
+      @wait ||= 16 * 33
+      @wait += 1
+      return if @wait < 15 * 33
+      puts 'ping'
+      @wait = 0
       @ping ||= ''
       url = @state.split(' ')[1] || "http://www.undefine.io"
       ping = Net::Ping::HTTP.new(url)

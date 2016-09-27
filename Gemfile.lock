@@ -1,7 +1,11 @@
 PATH
   remote: .
   specs:
-    bstrik (0.1.0)
+    bstick (0.1.5)
+      color (~> 1.8)
+      daemons (~> 1.2)
+      libusb (~> 0.5)
+      net-ping (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -19,13 +23,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bstrik!
+  bstick!
   bundler (~> 1.11)
-  color (~> 1.8)
-  daemons (~> 1.2)
-  libusb (~> 0.5)
   minitest (~> 5.0)
-  net-ping (~> 2.0)
   rake (~> 10.0)
 
 BUNDLED WITH

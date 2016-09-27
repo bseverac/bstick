@@ -6,8 +6,9 @@ if !ARGV[0]
 end
 
 def write(state)
-  File.truncate('/tmp/led.state', 0)
-  File.write('/tmp/led.state', state, 0)
+  file = File.expand_path("../../led.state", __FILE__)
+  File.truncate(file, 0)
+  File.write(file, state, 0)
 end
 
 case ARGV[0]

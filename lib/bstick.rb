@@ -84,18 +84,14 @@ module Bstick
       @wait += 1
       return if @wait < 15 * 33
       @wait = 0
-      @ping ||= ''
       url = @state.split(' ')[1] || "http://www.undefine.io"
       ping = Net::Ping::HTTP.new(url)
       @logger.info "ping #{url} #{ping.ping?}"
       if result = ping.ping?
-        return if @ping == 'true'
         set_colors(green, green)
       else
-        return if @ping == 'false'
         set_colors(red, red)
       end
-      @ping = result ? 'true' : 'false'
     end
 
     def handle_state

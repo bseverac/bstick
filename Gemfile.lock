@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bstick (0.1.5)
+    bstick (0.1.6)
       color (~> 1.8)
       daemons (~> 1.2)
       libusb (~> 0.5)

@@ -1,14 +1,19 @@
 require "bstick/version"
 require "net/ping"
+require "logger"
 require_relative "blinkstick.rb"
 
 module Bstick
   class Server
     def initialize
-      file = File.expand_path("../../led.state", __FILE__)
-      @file   = File.open(file, "a+")
-      @state  = 'off'
+      init
+    end
+
+    def init
+      @logger = ::Logger.new('/var/log/bstick.log', 1, 1024000)
+      @state  = ''
       @values = {}
+      @b      = nil
     end
 
     def stick
@@ -29,30 +34,40 @@ module Bstick
 
     def read_state
       @old_state = @state
+      file    = File.expand_path("../../led.state", __FILE__)
+      @file   = File.open(file, "a+")
+      File.chmod(0777, file)
       @file.seek(0)
       @state = @file.readline.strip rescue 'off'
+      @file.close
     end
 
     def set_colors(color_1, color_2)
-      stick.set_color(0, 0, color_1)
-      stick.set_color(0, 1, color_2)
+      if stick
+        stick.set_color(0, 0, color_1)
+        stick.set_color(0, 1, color_2)
+      else
+        @logger.error 'no stick found'
+        sleep 10
+        init
+      end
     end
 
     def off_state
       return if @old_state == 'off'
-      puts 'off'
+      @logger.info 'off'
       set_colors(black, black)
     end
 
     def on_state
       return if @old_state == 'on'
-      puts 'on'
+      @logger.info 'on'
       set_colors(green, green)
     end
 
     def blink_state
       if @old_state != 'blink'
-        puts 'blink'
+        @logger.info 'blink'
         @values = { green: 0, direction: 20 }
       end
       color_1 = Color::RGB.new(0xFF - @values[:green], @values[:green], 0x00)
@@ -68,11 +83,11 @@ module Bstick
       @wait ||= 16 * 33
       @wait += 1
       return if @wait < 15 * 33
-      puts 'ping'
       @wait = 0
       @ping ||= ''
       url = @state.split(' ')[1] || "http://www.undefine.io"
       ping = Net::Ping::HTTP.new(url)
+      @logger.info "ping #{url} #{ping.ping?}"
       if ping.ping?
         return if @ping == 'true'
         set_colors(green, green)
@@ -93,10 +108,17 @@ module Bstick
     end
 
     def run
+      @logger.info 'started'
       loop do
-        read_state
-        handle_state
-        sleep 1/33.0
+        begin
+          read_state
+          handle_state
+          sleep 1/33.0
+        rescue => e
+          @logger.error e.message
+          sleep 10
+          init
+        end
       end
     end
   end

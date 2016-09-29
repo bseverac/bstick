@@ -3,6 +3,11 @@
 require 'bstick'
 require 'daemons'
 
+if ARGV[0] && ARGV[0] == '-v'
+  puts Bstick::VERSION
+  exit 1
+end
+
 Daemons.run_proc('server.rb') do
   Bstick::Server.new.run
 end

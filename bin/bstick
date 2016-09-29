@@ -6,15 +6,15 @@ if !ARGV[0]
 end
 
 def write(state)
-  file = File.expand_path("../../led.state", __FILE__)
+  file = File.expand_path("/var/bstick/led.state")
   File.truncate(file, 0)
   File.write(file, state, 0)
 end
 
 case ARGV[0]
-when 'on', 'off', 'blink' then
+when 'on', 'off', 'blink', 'random' then
   write(ARGV[0])
-when 'ping' then
+when 'ping', 'alarm' then
   write("#{ARGV[0]} #{ARGV[1]}")
 when 'run' then
   write('blink')

@@ -10,9 +10,11 @@ module Bstick
     end
 
     def init
-      @logger = ::Logger.new('/var/log/bstick.log', 1, 1024000)
+      system 'sudo mkdir -p /var/bstick'
+      system 'sudo chmod 777 /var/bstick'
+      @logger = ::Logger.new('/var/bstick/bstick.log', 1, 1024000)
       @state  = ''
-      @values = {}
+      @values = nil
       @b      = nil
     end
 
@@ -34,7 +36,7 @@ module Bstick
 
     def read_state
       @old_state = @state
-      file    = File.expand_path("../../led.state", __FILE__)
+      file    = File.expand_path("/var/bstick/led.state", __FILE__)
       @file   = File.open(file, "a+")
       File.chmod(0777, file)
       @file.seek(0)
@@ -43,9 +45,12 @@ module Bstick
     end
 
     def set_colors(color_1, color_2)
-      if stick
+      if stick && (color_1 != @color_1 || color_2 != @color_2)
+        @logger.info @state
         stick.set_color(0, 0, color_1)
         stick.set_color(0, 1, color_2)
+        @color_1 = color_1
+        @color_2 = color_2
       else
         @logger.error 'no stick found'
         sleep 10
@@ -54,22 +59,15 @@ module Bstick
     end
 
     def off_state
-      return if @old_state == 'off'
-      @logger.info 'off'
       set_colors(black, black)
     end
 
     def on_state
-      return if @old_state == 'on'
-      @logger.info 'on'
       set_colors(green, green)
     end
 
     def blink_state
-      if @old_state != 'blink'
-        @logger.info 'blink'
-        @values = { green: 0, direction: 20 }
-      end
+      @values = { green: 0, direction: 20 } if !@values
       color_1 = Color::RGB.new(0xFF - @values[:green], @values[:green], 0x00)
       color_2 = Color::RGB.new(@values[:green], 0xFF - @values[:green], 0x00)
       @values[:green] += @values[:direction]
@@ -80,7 +78,6 @@ module Bstick
     end
 
     def ping_state
-      @wait ||= 16 * 33
       @wait += 1
       return if @wait < 15 * 33
       @wait = 0
@@ -94,12 +91,36 @@ module Bstick
       end
     end
 
+    def random_state
+      @wait += 1
+      return if @wait < 0.5 * 33
+      @wait = 0
+      color_1 = Color::RGB.new(rand(0..0xFF), rand(0..0xFF), rand(0..0xFF))
+      color_2 = Color::RGB.new(rand(0..0xFF), rand(0..0xFF), rand(0..0xFF))
+      set_colors(color_1, color_2)
+    end
+
+    def alarm_state
+      time = Time.parse(@state.split(' ')[1])
+      if time < Time.now
+        on_state
+      else
+        random_state
+      end
+    end
+
     def handle_state
+      if @old_state != @state
+        @values = nil
+        @wait = 100000000000000
+      end
       case @state.split(' ').first
       when 'off'   then off_state
+      when 'random'then random_state
       when 'on'    then on_state
       when 'blink' then blink_state
       when 'ping'  then ping_state
+      when 'alarm' then alarm_state
       end
     end
 

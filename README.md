@@ -33,7 +33,7 @@ Or install it yourself as:
   bstick ping http://www.undefine.io
 ```
 ```bash
-echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"20a0\", ATTR{idProduct}==\"41e5\", MODE:=\"0666\"" | sudo tee /etc/udev/rules.d/85-blinkstick.rules
+echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"20a0\", ATTR{idProduct}==\"41e5\", MODE:=\"0777\"" | sudo tee /etc/udev/rules.d/85-blinkstick.rules
 ```
 ## Development
 

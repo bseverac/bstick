@@ -12,6 +12,8 @@ module Bstick
     def init
       system 'sudo mkdir -p /var/bstick'
       system 'sudo chmod 777 /var/bstick'
+      system 'sudo touch /var/bstick/led.state'
+      system 'sudo chmod 777 /var/bstick/led.state'
       @logger = ::Logger.new('/var/bstick/bstick.log', 1, 1024000)
       @state  = ''
       @values = nil
@@ -45,12 +47,14 @@ module Bstick
     end
 
     def set_colors(color_1, color_2)
-      if stick && (color_1 != @color_1 || color_2 != @color_2)
-        @logger.info @state
-        stick.set_color(0, 0, color_1)
-        stick.set_color(0, 1, color_2)
-        @color_1 = color_1
-        @color_2 = color_2
+      if stick
+        if (color_1 != @color_1 || color_2 != @color_2)
+          @logger.info @state
+          stick.set_color(0, 0, color_1)
+          stick.set_color(0, 1, color_2)
+          @color_1 = color_1
+          @color_2 = color_2
+        end
       else
         @logger.error 'no stick found'
         sleep 10

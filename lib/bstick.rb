@@ -106,7 +106,7 @@ module Bstick
 
     def alarm_state
       time = Time.parse(@state.split(' ')[1])
-      if time < Time.now
+      if Time.now < time
         on_state
       else
         random_state
